@@ -1,8 +1,9 @@
 package com.example.colorit.di
 
 import android.content.Context
-import com.example.colorit.data.AppDatabase
-import com.example.colorit.data.ArtworkDao
+import androidx.room.Room
+import com.example.colorit.data.database.ColorItDatabase
+import com.example.colorit.data.database.DrawingDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,13 +17,21 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return AppDatabase.getDatabase(context)
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ): ColorItDatabase {
+        return Room.databaseBuilder(
+            context,
+            ColorItDatabase::class.java,
+            "colorit_database"
+        ).build()
     }
 
     @Provides
     @Singleton
-    fun provideArtworkDao(database: AppDatabase): ArtworkDao {
-        return database.artworkDao()
+    fun provideDrawingDao(
+        database: ColorItDatabase
+    ): DrawingDao {
+        return database.drawingDao()
     }
 }

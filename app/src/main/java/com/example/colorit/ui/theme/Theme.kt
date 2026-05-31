@@ -1,41 +1,48 @@
 package com.example.colorit.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
-// Colorful kid-friendly light color scheme
-private val LightColorScheme = lightColorScheme(
-    primary = AccentPurple,
-    secondary = AccentPink,
-    tertiary = AccentBlue,
-    background = OffWhite,
-    surface = White,
-    onPrimary = White,
-    onSecondary = White,
-    onBackground = TextDark,
-    onSurface = TextDark,
-    primaryContainer = PastelPurple,
-    secondaryContainer = PastelPink,
-    tertiaryContainer = PastelBlue
-)
-
-// Glow-friendly colorful dark color scheme
 private val DarkColorScheme = darkColorScheme(
-    primary = NeonPink,
-    secondary = NeonCyan,
-    tertiary = NeonYellow,
-    background = Color(0xFF120024), // Rich, glowing night dark violet
-    surface = Color(0xFF220E3E),
+    primary = DarkPastelPink,
+    secondary = DarkPastelBlue,
+    tertiary = DarkPastelYellow,
+    background = DarkPastelBackground,
+    surface = DarkPastelSurface,
     onPrimary = Color.Black,
     onSecondary = Color.Black,
-    onBackground = Color.White,
-    onSurface = Color.White,
-    primaryContainer = AccentPurple,
-    secondaryContainer = AccentPink
+    onTertiary = Color.Black,
+    onBackground = DarkTextLight,
+    onSurface = DarkTextLight
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = PastelPink,
+    secondary = PastelBlue,
+    tertiary = PastelYellow,
+    background = Color(0xFFFCFBF7), // Warm creamy background
+    surface = Color.White,
+    onPrimary = TextDark,
+    onSecondary = TextDark,
+    onTertiary = TextDark,
+    onBackground = TextDark,
+    onSurface = TextDark
+)
+
+// Extra rounded corners for playful, child-friendly appearance
+val PlayfulShapes = Shapes(
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(32.dp),
+    extraLarge = RoundedCornerShape(40.dp)
 )
 
 @Composable
@@ -48,6 +55,7 @@ fun ColorItTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = PlayfulShapes,
         content = content
     )
 }

@@ -18,10 +18,26 @@ import kotlin.math.sin
  */
 object AudioManager {
     private val scope = CoroutineScope(Dispatchers.Default)
+    private var prefs: android.content.SharedPreferences? = null
 
     // User settings toggles
     var isSoundEnabled: Boolean = true
+        set(value) {
+            field = value
+            prefs?.edit()?.putBoolean("sound_enabled", value)?.apply()
+        }
+
     var isMusicEnabled: Boolean = true
+        set(value) {
+            field = value
+            prefs?.edit()?.putBoolean("music_enabled", value)?.apply()
+        }
+
+    fun init(context: Context) {
+        prefs = context.applicationContext.getSharedPreferences("colorit_settings", Context.MODE_PRIVATE)
+        isSoundEnabled = prefs?.getBoolean("sound_enabled", true) ?: true
+        isMusicEnabled = prefs?.getBoolean("music_enabled", true) ?: true
+    }
 
     // System tone generator for simple beeps
     private val toneGen = ToneGenerator(AndroidAudioManager.STREAM_MUSIC, 80)
