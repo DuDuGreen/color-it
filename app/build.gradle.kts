@@ -87,4 +87,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.espresso.core)
+    implementation(libs.play.services.ads)
+    implementation(libs.coil.compose)
 }

@@ -34,4 +34,14 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        com.example.colorit.utils.AudioManager.resumeMusic()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        com.example.colorit.utils.AudioManager.pauseMusic()
+    }
 }

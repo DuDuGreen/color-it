@@ -35,19 +35,38 @@ class StickersViewModel @Inject constructor(
     private val redoStack = mutableListOf<List<StickerInstance>>()
 
     val stickerCategories = mapOf(
-        "Animals 🦊" to listOf("🐶", "🐱", "🦁", "🐰", "🐼", "🐻", "🦄", "🐸", "🐵", "🐧", "🦖", "🐙"),
-        "Emojis 🎈" to listOf("😄", "😎", "🥳", "🎈", "🎁", "🎉", "🎨", "🌟", "🍔", "🍕", "🍦", "🚗"),
-        "Shapes 🌟" to listOf("⭐️", "🌟", "❤️", "🧡", "💛", "💚", "💙", "💜", "🍀", "☀️", "🌙", "🌈")
+        "Animals 🦊" to listOf(
+            "🐶", "🐱", "🦁", "🐰", "🐼", "🐻", "🐨", "🦊", "🐯", "🐸", 
+            "🐵", "🐧", "🦖", "🐙", "🐷", "🐮", "🐹", "🐭", "🐔", "🦆", 
+            "🦉", "🐝", "🦋", "🐞", "🐠", "🐬", "🐳", "🐊", "🐢", "🐘"
+        ),
+        "Play & Toys 🧸" to listOf(
+            "🧸", "🎈", "🎁", "🎉", "🎨", "🧩", "🎮", "🛹", "🚲", "🛴", 
+            "⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🏉", "🎱", "🪀", "🪁"
+        ),
+        "Shapes & Magic ✨" to listOf(
+            "⭐️", "🌟", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", 
+            "🤎", "🍀", "☀️", "🌙", "🌈", "⚡️", "☄️", "🔥", "💧", "🔮", 
+            "💎", "🎀", "🪄", "🎩", "👑"
+        ),
+        "Food & Sweets 🍭" to listOf(
+            "🍕", "🍔", "🍟", "🌭", "🥪", "🌮", "🍦", "🍧", "🍨", "🍩", 
+            "🍪", "🎂", "🍰", "🧁", "🍫", "🍬", "🍭", "🍮", "🍿", "🥤"
+        ),
+        "Transport & Space 🚀" to listOf(
+            "🚀", "🛸", "🪐", "🌍", "🚗", "🚕", "🚙", "🚌", "🚑", "🚒", 
+            "🚓", "🚜", "🚚", "🚛", "🏎", "🛵", "🚲", "✈️", "🚁", "⛵️"
+        )
     )
 
-    fun addSticker(emoji: String) {
+    fun addSticker(emoji: String, position: Offset) {
         saveToUndoStack()
         
         val id = "sticker_${System.currentTimeMillis()}"
         val newSticker = StickerInstance(
             id = id,
             emoji = emoji,
-            position = Offset(300f, 400f), // Will be centered dynamically in screen
+            position = position,
             scale = 1.0f,
             rotation = 0f
         )

@@ -1,7 +1,10 @@
 package com.example.colorit.ui.settings
 
 import android.widget.Toast
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,14 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.colorit.ui.components.PastelCard
-import com.example.colorit.ui.components.PlayfulButton
+import com.example.colorit.ui.components.*
 import com.example.colorit.ui.theme.*
 import com.example.colorit.util.SoundHelper
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
@@ -46,172 +50,238 @@ fun SettingsScreen(
         mathError = false
     }
 
-    Scaffold(
-        topBar = {
-            SettingsHeader(
-                onBack = {
-                    soundHelper.playPopSound()
-                    onBack()
-                }
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Title description
-            Text(
-                text = "Customize your play settings here! 🎈",
-                fontSize = 16.sp,
-                color = TextDark.copy(alpha = 0.7f),
-                fontWeight = FontWeight.Medium
-            )
+    // Staggered pop-in animations for setting cards
+    val soundCardScale = remember { Animatable(0f) }
+    val musicCardScale = remember { Animatable(0f) }
+    val parentCardScale = remember { Animatable(0f) }
 
-            Spacer(modifier = Modifier.height(10.dp))
+    LaunchedEffect(Unit) {
+        launch {
+            soundCardScale.animateTo(1f, spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow))
+        }
+        kotlinx.coroutines.delay(60)
+        launch {
+            musicCardScale.animateTo(1f, spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow))
+        }
+        kotlinx.coroutines.delay(60)
+        launch {
+            parentCardScale.animateTo(1f, spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow))
+        }
+    }
 
-            // Sound Card
-            PastelCard(
-                backgroundColor = Color.White,
-                borderColor = PastelBlue.copy(alpha = 0.6f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
+    // Wrap the entire screen in the interactive BubbleBackground
+    BubbleBackground(modifier = modifier) {
+        Scaffold(
+            topBar = {
+                SettingsHeader(
+                    onBack = {
+                        soundHelper.playPopSound()
+                        onBack()
+                    }
+                )
+            },
+            bottomBar = {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .navigationBarsPadding()
+                        .padding(bottom = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column {
-                        Text(
-                            text = "Sound Effects 🔊",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark
-                        )
-                        Text(
-                            text = "Play bubbly noises on taps",
-                            fontSize = 13.sp,
-                            color = TextDark.copy(alpha = 0.5f)
-                        )
-                    }
-
-                    PlayfulButton(
-                        onClick = {
-                            viewModel.toggleSound()
-                            soundHelper.playPopSound()
-                        },
-                        backgroundColor = if (isSoundEnabled) PastelMint else Color.LightGray.copy(alpha = 0.3f),
-                        contentColor = TextDark,
-                        shape = CircleShape,
-                        border = null,
-                        modifier = Modifier.width(90.dp).height(44.dp)
-                    ) {
-                        Text(
-                            text = if (isSoundEnabled) "ON 🌟" else "OFF 💤",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                    }
+                    BannerAd()
                 }
-            }
-
-            // Music Card
-            PastelCard(
-                backgroundColor = Color.White,
-                borderColor = PastelPurple.copy(alpha = 0.6f),
-                modifier = Modifier.fillMaxWidth()
+            },
+            containerColor = Color.Transparent // Allow BubbleBackground to show through
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
+                // Title description
+                Text(
+                    text = "Customize your play settings here! 🎈",
+                    fontSize = 16.sp,
+                    color = TextDarkGreen,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Sound Card
+                PastelCard(
+                    backgroundColor = CardYellow,
+                    borderColor = CountryOutline,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Background Music 🎶",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark
-                        )
-                        Text(
-                            text = "Soft melodies in menus",
-                            fontSize = 13.sp,
-                            color = TextDark.copy(alpha = 0.5f)
-                        )
-                    }
-
-                    PlayfulButton(
-                        onClick = {
-                            viewModel.toggleMusic()
-                            soundHelper.playPopSound()
-                        },
-                        backgroundColor = if (isMusicEnabled) PastelBlue else Color.LightGray.copy(alpha = 0.3f),
-                        contentColor = TextDark,
-                        shape = CircleShape,
-                        border = null,
-                        modifier = Modifier.width(90.dp).height(44.dp)
-                    ) {
-                        Text(
-                            text = if (isMusicEnabled) "ON 🌟" else "OFF 💤",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-            }
-
-            // Parental Lock Zone Card
-            PastelCard(
-                backgroundColor = Color.White,
-                borderColor = PastelPink.copy(alpha = 0.6f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .graphicsLayer {
+                            scaleX = soundCardScale.value
+                            scaleY = soundCardScale.value
+                        }
+                        .border(3.dp, CountryOutline, RoundedCornerShape(24.dp))
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Parent Zone 🔒",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark
-                        )
+                        Column {
+                            Text(
+                                text = "Sound Effects 🔊",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = TextDarkGreen
+                            )
+                            Text(
+                                text = "Play bubbly noises on taps",
+                                fontSize = 13.sp,
+                                color = TextLightGreen,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        PlayfulButton(
+                            onClick = {
+                                viewModel.toggleSound()
+                                soundHelper.playPopSound()
+                            },
+                            backgroundColor = if (isSoundEnabled) CountryGrass else Color.White,
+                            contentColor = TextDarkGreen,
+                            shape = CircleShape,
+                            border = BorderStroke(2.dp, CountryOutline),
+                            modifier = Modifier
+                                .width(90.dp)
+                                .height(44.dp)
+                        ) {
+                            Text(
+                                text = if (isSoundEnabled) "ON 🌟" else "OFF 💤",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
-                    Text(
-                        text = "Reset app data or empty the database gallery. Secure child-lock prevents accidental deletes.",
-                        fontSize = 13.sp,
-                        color = TextDark.copy(alpha = 0.5f)
-                    )
+                }
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    PlayfulButton(
-                        onClick = {
-                            soundHelper.playPopSound()
-                            generateQuestion()
-                            showParentalLock = true
-                        },
-                        backgroundColor = PastelPink.copy(alpha = 0.8f),
-                        contentColor = TextDark,
-                        modifier = Modifier.fillMaxWidth().height(48.dp)
+                // Music Card
+                PastelCard(
+                    backgroundColor = CardYellow,
+                    borderColor = CountryOutline,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            scaleX = musicCardScale.value
+                            scaleY = musicCardScale.value
+                        }
+                        .border(3.dp, CountryOutline, RoundedCornerShape(24.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Clear Gallery 🗑️", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Column {
+                            Text(
+                                text = "Background Music 🎶",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = TextDarkGreen
+                            )
+                            Text(
+                                text = "Soft melodies in menus",
+                                fontSize = 13.sp,
+                                color = TextLightGreen,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        PlayfulButton(
+                            onClick = {
+                                viewModel.toggleMusic()
+                                soundHelper.playPopSound()
+                            },
+                            backgroundColor = if (isMusicEnabled) CountryGrass else Color.White,
+                            contentColor = TextDarkGreen,
+                            shape = CircleShape,
+                            border = BorderStroke(2.dp, CountryOutline),
+                            modifier = Modifier
+                                .width(90.dp)
+                                .height(44.dp)
+                        ) {
+                            Text(
+                                text = if (isMusicEnabled) "ON 🌟" else "OFF 💤",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+
+                // Parental Lock Zone Card
+                PastelCard(
+                    backgroundColor = CardYellow,
+                    borderColor = CountryOutline,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            scaleX = parentCardScale.value
+                            scaleY = parentCardScale.value
+                        }
+                        .border(3.dp, CountryOutline, RoundedCornerShape(24.dp))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Parent Zone 🔒",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = TextDarkGreen
+                            )
+                        }
+                        Text(
+                            text = "Reset app data or empty the database gallery. Secure child-lock prevents accidental deletes.",
+                            fontSize = 13.sp,
+                            color = TextLightGreen,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        PlayfulButton(
+                            onClick = {
+                                soundHelper.playPopSound()
+                                generateQuestion()
+                                showParentalLock = true
+                            },
+                            backgroundColor = ButtonOrange,
+                            contentColor = Color.White,
+                            border = BorderStroke(2.dp, CountryOutline),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                CozyTrashIcon(modifier = Modifier.size(16.dp), color = Color.White)
+                                Text("Clear Gallery", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                            }
+                        }
                     }
                 }
             }
@@ -222,6 +292,11 @@ fun SettingsScreen(
     if (showParentalLock) {
         AlertDialog(
             onDismissRequest = { showParentalLock = false },
+            modifier = Modifier.border(3.dp, CountryOutline, MaterialTheme.shapes.large),
+            shape = MaterialTheme.shapes.large,
+            containerColor = CardYellow,
+            titleContentColor = TextDark,
+            textContentColor = TextDark.copy(alpha = 0.8f),
             title = {
                 Text(
                     text = "Parents Only! 🦊",
@@ -238,7 +313,8 @@ fun SettingsScreen(
                     Text(
                         text = "Please solve this question to unlock:",
                         fontSize = 14.sp,
-                        color = TextDark.copy(alpha = 0.7f),
+                        color = TextDark.copy(alpha = 0.8f),
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
@@ -252,7 +328,9 @@ fun SettingsScreen(
 
                     // Bubbly virtual numeric entrypad
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
@@ -261,7 +339,8 @@ fun SettingsScreen(
                             fontWeight = FontWeight.Bold,
                             color = if (mathError) Color.Red else if (answerInput.isEmpty()) Color.LightGray else TextDark,
                             modifier = Modifier
-                                .background(Color.LightGray.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                                .background(Color.White, RoundedCornerShape(12.dp))
+                                .border(2.dp, CountryOutline, RoundedCornerShape(12.dp))
                                 .padding(horizontal = 24.dp, vertical = 12.dp)
                         )
                     }
@@ -291,13 +370,15 @@ fun SettingsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 rowKeys.forEach { key ->
+                                    val isClearDelete = key == "Clear" || key == "⌫"
+                                    val keyBgColor = if (isClearDelete) ButtonOrange.copy(alpha = 0.2f) else Color.White
+                                    val keyBorder = if (isClearDelete) ButtonOrange else CountryOutline
+                                    
                                     Box(
                                         modifier = Modifier
                                             .size(54.dp)
-                                            .background(
-                                                color = if (key == "Clear" || key == "⌫") PastelPeach.copy(alpha = 0.3f) else PastelYellow.copy(alpha = 0.5f),
-                                                shape = CircleShape
-                                            )
+                                            .background(keyBgColor, shape = CircleShape)
+                                            .border(2.dp, keyBorder, CircleShape)
                                             .clip(CircleShape)
                                             .clickable {
                                                 soundHelper.playPopSound()
@@ -334,9 +415,9 @@ fun SettingsScreen(
             confirmButton = {
                 PlayfulButton(
                     onClick = {
-                        soundHelper.playPopSound()
                         val correctResult = mathQuestion.first + mathQuestion.second
                         if (answerInput == correctResult.toString()) {
+                            soundHelper.playSuccessSound()
                             viewModel.clearAllGalleryDrawings { success ->
                                 if (success) {
                                     Toast.makeText(context, "Gallery wiped clean! 🧹", Toast.LENGTH_SHORT).show()
@@ -346,13 +427,21 @@ fun SettingsScreen(
                                 }
                             }
                         } else {
+                            soundHelper.playErrorSound()
                             mathError = true
                             answerInput = ""
                         }
                     },
-                    backgroundColor = PastelMint
+                    backgroundColor = CountryGrass,
+                    border = BorderStroke(2.dp, CountryOutline)
                 ) {
-                    Text("Unlock & Wipe 🗑️", color = TextDark, fontWeight = FontWeight.Bold)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        CozyTrashIcon(modifier = Modifier.size(16.dp), color = TextDarkGreen)
+                        Text("Unlock & Wipe", color = TextDarkGreen, fontWeight = FontWeight.Bold)
+                    }
                 }
             },
             dismissButton = {
@@ -361,9 +450,10 @@ fun SettingsScreen(
                         soundHelper.playPopSound()
                         showParentalLock = false
                     },
-                    backgroundColor = Color.LightGray.copy(alpha = 0.2f)
+                    backgroundColor = Color.White,
+                    border = BorderStroke(2.dp, CountryOutline)
                 ) {
-                    Text("Cancel", color = TextDark)
+                    Text("Cancel", color = TextDarkGreen)
                 }
             }
         )
@@ -378,17 +468,17 @@ private fun SettingsHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
+        PlayfulIconButton(
             onClick = onBack,
-            modifier = Modifier
-                .size(44.dp)
-                .shadow(elevation = 3.dp, shape = CircleShape)
-                .background(PastelPeach, shape = CircleShape)
+            backgroundColor = Color.White,
+            contentColor = TextDarkGreen,
+            modifier = Modifier.size(44.dp)
         ) {
-            Text("⬅️", fontSize = 18.sp)
+            CozyBackIcon(modifier = Modifier.size(20.dp), color = TextDarkGreen)
         }
         Spacer(modifier = Modifier.width(16.dp))
         Text(
@@ -396,7 +486,7 @@ private fun SettingsHeader(
             style = MaterialTheme.typography.displayLarge.copy(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = TextDark
+                color = TextDarkGreen
             )
         )
     }

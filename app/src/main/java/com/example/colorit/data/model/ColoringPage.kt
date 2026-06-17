@@ -12,11 +12,13 @@ data class ColoringPage(
     val id: String,
     val title: String,
     val category: String,
-    val shapes: List<ColoringShape>
+    val shapes: List<ColoringShape>,
+    val imageResName: String? = null
 )
 
 data class BrushStroke(
     val points: List<Offset>,
     val color: Color,
-    val size: Float
+    val size: Float,
+    val isStraightLine: Boolean = false
 )

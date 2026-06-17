@@ -12,37 +12,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 private val DarkColorScheme = darkColorScheme(
-    primary = DarkPastelPink,
-    secondary = DarkPastelBlue,
-    tertiary = DarkPastelYellow,
-    background = DarkPastelBackground,
-    surface = DarkPastelSurface,
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onTertiary = Color.Black,
-    onBackground = DarkTextLight,
-    onSurface = DarkTextLight
+    primary = ButtonOrange,
+    secondary = CountryGrass,
+    tertiary = CardYellow,
+    background = CountrySky,
+    surface = CardYellow,
+    onPrimary = Color.White,
+    onSecondary = TextDarkGreen,
+    onTertiary = TextDarkGreen,
+    onBackground = TextDarkGreen,
+    onSurface = TextDarkGreen
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PastelPink,
-    secondary = PastelBlue,
-    tertiary = PastelYellow,
-    background = Color(0xFFFCFBF7), // Warm creamy background
-    surface = Color.White,
-    onPrimary = TextDark,
-    onSecondary = TextDark,
-    onTertiary = TextDark,
-    onBackground = TextDark,
-    onSurface = TextDark
+    primary = ButtonOrange,
+    secondary = CountryGrass,
+    tertiary = CardYellow,
+    background = CountrySky,
+    surface = CardYellow,
+    onPrimary = Color.White,
+    onSecondary = TextDarkGreen,
+    onTertiary = TextDarkGreen,
+    onBackground = TextDarkGreen,
+    onSurface = TextDarkGreen
 )
 
 // Extra rounded corners for playful, child-friendly appearance
 val PlayfulShapes = Shapes(
     small = RoundedCornerShape(12.dp),
     medium = RoundedCornerShape(20.dp),
-    large = RoundedCornerShape(32.dp),
-    extraLarge = RoundedCornerShape(40.dp)
+    large = RoundedCornerShape(28.dp),
+    extraLarge = RoundedCornerShape(36.dp)
 )
 
 @Composable
@@ -50,6 +50,7 @@ fun ColorItTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    // Standardize both dark and light theme to the bright countryside theme
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(

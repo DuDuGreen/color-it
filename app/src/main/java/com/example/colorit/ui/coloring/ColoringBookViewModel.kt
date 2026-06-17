@@ -10,7 +10,7 @@ class ColoringBookViewModel @Inject constructor(
     private val repository: ColoringRepository
 ) : ViewModel() {
 
-    val categories = listOf("Animals", "Nature", "Vehicles", "Space", "Numbers")
+    val categories = listOf("All", "Animals", "Nature", "Vehicles", "Space", "Dinosaurs", "Birds", "Numbers")
 
     fun getPagesByCategory(category: String) = repository.getPagesByCategory(category)
 }

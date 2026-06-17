@@ -1,54 +1,35 @@
 package com.example.colorit.ui.home
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.colorit.ui.components.PastelCard
-import com.example.colorit.ui.theme.PastelBlue
-import com.example.colorit.ui.theme.PastelMint
-import com.example.colorit.ui.theme.PastelPeach
-import com.example.colorit.ui.theme.PastelPink
-import com.example.colorit.ui.theme.PastelPurple
-import com.example.colorit.ui.theme.PastelYellow
-import com.example.colorit.ui.theme.TextDark
+import com.example.colorit.R
+import com.example.colorit.ui.components.*
+import com.example.colorit.ui.theme.*
 
 @Composable
 fun HomeScreen(
@@ -59,210 +40,268 @@ fun HomeScreen(
     onNavigateToStickers: () -> Unit,
     onNavigateToGallery: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = {
-            HomeHeader(
-                onSettingsClicked = {
-                    viewModel.playClickSound()
-                    onNavigateToSettings()
-                }
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-        ) {
-            Text(
-                text = "Pick a Game! 🎈",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 24.sp,
-                    color = TextDark
-                ),
-                modifier = Modifier.padding(vertical = 12.dp)
-            )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(CardYellow)
+    ) {
+        // Full-screen background image
+        AsyncImage(
+            model = R.drawable.home_background,
+            contentDescription = "Home Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-            // Responsive grid for phones and tablets
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 160.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                contentPadding = PaddingValues(bottom = 32.dp),
-                modifier = Modifier.fillMaxSize()
+        Scaffold(
+            topBar = {
+                // Header (Matching circular avatar + Coins + Settings/Gallery)
+                HomeHeader(
+                    onBack = onBack,
+                    onGalleryClick = {
+                        viewModel.playClickSound()
+                        onNavigateToGallery()
+                    },
+                    onSettingsClick = {
+                        viewModel.playClickSound()
+                        onNavigateToSettings()
+                    }
+                )
+            },
+            bottomBar = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(bottom = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BannerAd()
+                }
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                item {
-                    MenuCard(
-                        title = "Coloring Book",
-                        icon = "📚",
-                        gradientColors = listOf(PastelPink, PastelYellow),
-                        onClick = {
-                            viewModel.playClickSound()
-                            onNavigateToColoringBook()
+                // 2. 2x2 Grid of game cards with horizontal padding
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp, vertical = 12.dp)
+                ) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        contentPadding = PaddingValues(bottom = 24.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            CountrysideMenuCard(
+                                title = "Coloring Book",
+                                labelBgColor = CountryGrassDark,
+                                labelTextColor = Color.White,
+                                illustration = { ColoringBookIcon(Modifier.size(80.dp)) },
+                                onClick = {
+                                    viewModel.playClickSound()
+                                    onNavigateToColoringBook()
+                                }
+                            )
                         }
-                    )
-                }
-                item {
-                    MenuCard(
-                        title = "Free Draw",
-                        icon = "✏️",
-                        gradientColors = listOf(PastelBlue, PastelMint),
-                        onClick = {
-                            viewModel.playClickSound()
-                            onNavigateToFreeDraw()
+                        item {
+                            CountrysideMenuCard(
+                                title = "Free Draw",
+                                labelBgColor = ButtonOrange,
+                                labelTextColor = Color.White,
+                                illustration = { FreeDrawIcon(Modifier.size(80.dp)) },
+                                onClick = {
+                                    viewModel.playClickSound()
+                                    onNavigateToFreeDraw()
+                                }
+                            )
                         }
-                    )
-                }
-                item {
-                    MenuCard(
-                        title = "Glow Draw",
-                        icon = "✨",
-                        gradientColors = listOf(Color(0xFF2C3E50), PastelPurple),
-                        onClick = {
-                            viewModel.playClickSound()
-                            onNavigateToGlowDraw()
+                        item {
+                            CountrysideMenuCard(
+                                title = "Glow Draw",
+                                labelBgColor = GlowYellow,
+                                labelTextColor = TextDarkGreen,
+                                illustration = { GlowDrawIcon(Modifier.size(80.dp)) },
+                                onClick = {
+                                    viewModel.playClickSound()
+                                    onNavigateToGlowDraw()
+                                }
+                            )
                         }
-                    )
-                }
-                item {
-                    MenuCard(
-                        title = "Stickers",
-                        icon = "🧸",
-                        gradientColors = listOf(PastelPurple, PastelPink),
-                        onClick = {
-                            viewModel.playClickSound()
-                            onNavigateToStickers()
+                        item {
+                            CountrysideMenuCard(
+                                title = "Stickers",
+                                labelBgColor = PastelBlueDark,
+                                labelTextColor = Color.White,
+                                illustration = { StickersIcon(Modifier.size(80.dp)) },
+                                onClick = {
+                                    viewModel.playClickSound()
+                                    onNavigateToStickers()
+                                }
+                            )
                         }
-                    )
-                }
-                item {
-                    MenuCard(
-                        title = "Gallery",
-                        icon = "🖼️",
-                        gradientColors = listOf(PastelPeach, PastelMint),
-                        onClick = {
-                            viewModel.playClickSound()
-                            onNavigateToGallery()
-                        }
-                    )
+                    }
                 }
             }
         }
     }
 }
 
+/**
+ * Top Header matching the first reference UI screen:
+ * - Left: Circular fox avatar
+ * - Middle: Round star badge ("10")
+ * - Right: Gallery and Settings buttons
+ */
 @Composable
 private fun HomeHeader(
-    onSettingsClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    onBack: () -> Unit,
+    onGalleryClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(horizontal = 24.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(PastelYellow, shape = CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("🎨", fontSize = 24.sp)
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "Color It!",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = TextDark
-                )
-            )
+        // Left: Back button
+        PlayfulIconButton(
+            onClick = onBack,
+            backgroundColor = PastelPeach,
+            modifier = Modifier.size(42.dp)
+        ) {
+            CozyBackIcon(modifier = Modifier.size(18.dp), color = TextDark)
         }
 
-        // Settings Bubble Button
-        IconButton(
-            onClick = onSettingsClicked,
-            modifier = Modifier
-                .size(48.dp)
-                .shadow(elevation = 4.dp, shape = CircleShape)
-                .background(PastelBlue, shape = CircleShape)
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Middle: App Title
+        Text(
+            text = "Colorit 🎨",
+            style = MaterialTheme.typography.displayLarge.copy(
+                fontSize = 22.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = TextDarkGreen
+            ),
+            modifier = Modifier.weight(1f)
+        )
+
+        // Right: Gallery and Settings
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("⚙️", fontSize = 22.sp)
+            // Gallery
+            PlayfulIconButton(
+                onClick = onGalleryClick,
+                backgroundColor = Color.White,
+                modifier = Modifier.size(42.dp)
+            ) {
+                CozyGalleryIcon(modifier = Modifier.size(20.dp), color = CountryOutline)
+            }
+
+            // Settings
+            PlayfulIconButton(
+                onClick = onSettingsClick,
+                backgroundColor = Color.White,
+                modifier = Modifier.size(42.dp)
+            ) {
+                CozySettingsIcon(modifier = Modifier.size(20.dp), color = CountryOutline)
+            }
         }
     }
 }
 
+/**
+ * Hand-drawn rounded menu card.
+ * Bottom 25% of the card is a colored banner container carrying the text label.
+ */
 @Composable
-private fun MenuCard(
+private fun CountrysideMenuCard(
     title: String,
-    icon: String,
-    gradientColors: List<Color>,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    labelBgColor: Color,
+    labelTextColor: Color,
+    illustration: @Composable () -> Unit,
+    onClick: () -> Unit
 ) {
-    // Premium animated gradient background
-    val infiniteTransition = rememberInfiniteTransition(label = "gradient_shift")
-    val offset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 600f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset"
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.90f else 1.0f,
+        animationSpec = spring(dampingRatio = 0.5f, stiffness = 300f),
+        label = "CardScale"
     )
 
-    val animatedBrush = Brush.linearGradient(
-        colors = gradientColors,
-        start = Offset(offset, 0f),
-        end = Offset(offset + 300f, 300f)
-    )
-
-    PastelCard(
-        backgroundColor = Color.Transparent, // Managed by gradient
-        borderColor = Color.White.copy(alpha = 0.4f),
-        shadowElevation = 6.dp,
-        contentPadding = 0.dp,
-        modifier = modifier
-            .aspectRatio(1.1f)
-            .clip(MaterialTheme.shapes.large)
-            .background(animatedBrush)
-            .clickable { onClick() }
+    Box(
+        modifier = Modifier
+            .aspectRatio(0.9f)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .shadow(6.dp, RoundedCornerShape(24.dp))
+            .background(CardYellow, RoundedCornerShape(24.dp))
+            .border(3.dp, CountryOutline, RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(24.dp))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            )
     ) {
         Column(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Upper: Illustration
             Box(
                 modifier = Modifier
-                    .size(70.dp)
-                    .background(Color.White.copy(alpha = 0.25f), shape = CircleShape),
+                    .weight(1f)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = icon, fontSize = 42.sp)
+                illustration()
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (gradientColors.first() == Color(0xFF2C3E50)) Color.White else TextDark
+
+            // Bottom: Bubbly text label container
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(38.dp)
+                    .background(labelBgColor)
+                    .border(3.dp, CountryOutline),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = labelTextColor
                 )
-            )
+            }
         }
     }
 }
+
+
+
+/**
+ * Character group graphic drawing (fox, cat, rabbit, frog) standing in front of green hills.
+ */
+/**
+ * Character group graphic drawing (fox, cat, rabbit, frog) standing in front of green hills.
+ */

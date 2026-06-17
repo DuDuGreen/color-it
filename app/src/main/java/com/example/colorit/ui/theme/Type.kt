@@ -2,15 +2,23 @@ package com.example.colorit.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.example.colorit.R
+
+// Bubbly, kid-friendly Fredoka font family
+val Fredoka = FontFamily(
+    Font(R.font.fredoka, FontWeight.Normal),
+    Font(R.font.fredoka, FontWeight.Bold)
+)
 
 // Playful typography styles suitable for kids age 2-8
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = Fredoka,
         fontWeight = FontWeight.Bold,
         fontSize = 40.sp,
         lineHeight = 48.sp,
@@ -18,7 +26,7 @@ val Typography = Typography(
         color = TextDark
     ),
     headlineMedium = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = Fredoka,
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
@@ -26,7 +34,7 @@ val Typography = Typography(
         color = TextDark
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = Fredoka,
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
@@ -34,7 +42,7 @@ val Typography = Typography(
         color = TextDark
     ),
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = Fredoka,
         fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         lineHeight = 24.sp,
@@ -42,7 +50,7 @@ val Typography = Typography(
         color = TextDark
     ),
     labelLarge = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = Fredoka,
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         lineHeight = 20.sp,

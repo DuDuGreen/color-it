@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -57,7 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.colorit.data.model.BrushStroke
-import com.example.colorit.ui.components.PlayfulButton
+import com.example.colorit.ui.components.*
 import com.example.colorit.ui.theme.PastelBlue
 import com.example.colorit.ui.theme.PastelMint
 import com.example.colorit.ui.theme.PastelPeach
@@ -65,6 +66,14 @@ import com.example.colorit.ui.theme.PastelPink
 import com.example.colorit.ui.theme.PastelPurple
 import com.example.colorit.ui.theme.PastelYellow
 import com.example.colorit.ui.theme.TextDark
+import com.example.colorit.ui.theme.CozyRose
+import com.example.colorit.ui.theme.CozyBlush
+import com.example.colorit.ui.theme.CozyBlushLight
+import com.example.colorit.ui.theme.CozyCreamBackground
+import com.example.colorit.ui.theme.AppColorSpectrum
+import com.example.colorit.ui.theme.CountryOutline
+import com.example.colorit.ui.theme.CardYellow
+import androidx.compose.ui.graphics.Brush
 import com.example.colorit.util.SoundHelper
 
 data class Sparkle(
@@ -99,6 +108,7 @@ fun GlowDrawScreen(
     var showSavedDialog by remember { mutableStateOf(false) }
     var savedFilePath by remember { mutableStateOf("") }
     var showClearConfirm by remember { mutableStateOf(false) }
+    var showSpectrumDialog by remember { mutableStateOf(false) }
 
     val canvasBgColor = Color(0xFF0F172A) // Deep night slate
 
@@ -238,8 +248,17 @@ fun GlowDrawScreen(
                 }
             )
         },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize()
+        containerColor = Color.Transparent,
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        CozyCreamBackground,
+                        CozyBlushLight.copy(alpha = 0.5f)
+                    )
+                )
+            )
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -253,7 +272,7 @@ fun GlowDrawScreen(
                     .weight(1f)
                     .clip(MaterialTheme.shapes.large)
                     .background(canvasBgColor)
-                    .border(4.dp, PastelPurple.copy(alpha = 0.5f), MaterialTheme.shapes.large)
+                    .border(4.dp, CozyRose.copy(alpha = 0.5f), MaterialTheme.shapes.large)
                     .padding(8.dp)
                     .onSizeChanged { size ->
                         canvasWidth = size.width
@@ -368,7 +387,8 @@ fun GlowDrawScreen(
                 selectedColor = selectedColor,
                 brushSize = brushSize,
                 onColorSelected = { viewModel.selectColor(it) },
-                onBrushSizeChanged = { viewModel.updateBrushSize(it) }
+                onBrushSizeChanged = { viewModel.updateBrushSize(it) },
+                onSpectrumClick = { showSpectrumDialog = true }
             )
         }
     }
@@ -377,8 +397,13 @@ fun GlowDrawScreen(
     if (showSavedDialog) {
         AlertDialog(
             onDismissRequest = { showSavedDialog = false },
-            title = { Text("Drawing Saved! ✨", fontWeight = FontWeight.Bold) },
-            text = { Text("Your neon creation has been successfully saved to:\n$savedFilePath") },
+            modifier = Modifier.border(3.dp, CountryOutline, MaterialTheme.shapes.large),
+            shape = MaterialTheme.shapes.large,
+            containerColor = CardYellow,
+            titleContentColor = TextDark,
+            textContentColor = TextDark.copy(alpha = 0.8f),
+            title = { Text("Drawing Saved! ✨", fontWeight = FontWeight.ExtraBold) },
+            text = { Text("Your neon creation has been successfully saved to:\n$savedFilePath", fontWeight = FontWeight.Medium) },
             confirmButton = {
                 PlayfulButton(onClick = { showSavedDialog = false }) {
                     Text("Super!", color = Color.White)
@@ -391,8 +416,13 @@ fun GlowDrawScreen(
     if (showClearConfirm) {
         AlertDialog(
             onDismissRequest = { showClearConfirm = false },
-            title = { Text("Start Over? 🧹", fontWeight = FontWeight.Bold) },
-            text = { Text("Do you want to clear your current drawing and start fresh?") },
+            modifier = Modifier.border(3.dp, CountryOutline, MaterialTheme.shapes.large),
+            shape = MaterialTheme.shapes.large,
+            containerColor = CardYellow,
+            titleContentColor = TextDark,
+            textContentColor = TextDark.copy(alpha = 0.8f),
+            title = { Text("Start Over? 🧹", fontWeight = FontWeight.ExtraBold) },
+            text = { Text("Do you want to clear your current drawing and start fresh?", fontWeight = FontWeight.Medium) },
             confirmButton = {
                 PlayfulButton(
                     onClick = {
@@ -418,6 +448,14 @@ fun GlowDrawScreen(
             }
         )
     }
+
+    if (showSpectrumDialog) {
+        ColorSpectrumDialog(
+            initialColor = selectedColor,
+            onColorSelected = { viewModel.selectColor(it) },
+            onDismiss = { showSpectrumDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -431,79 +469,101 @@ private fun GlowHeader(
     onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .statusBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 8.dp)
     ) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .size(44.dp)
-                .shadow(elevation = 3.dp, shape = CircleShape)
-                .background(PastelPeach, shape = CircleShape)
+        // Row 1: Back Button + Title
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("⬅️", fontSize = 18.sp)
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Text(
-            text = "Glow Draw 🌌",
-            style = MaterialTheme.typography.displayLarge.copy(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = TextDark
-            ),
-            modifier = Modifier.weight(1f)
-        )
-
-        // Clear Trash
-        IconButton(
-            onClick = onClearAll,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .size(40.dp)
-                .background(PastelPink.copy(alpha = 0.2f), shape = CircleShape)
-        ) {
-            Text("🗑️", fontSize = 16.sp)
+            PlayfulIconButton(
+                onClick = onBack,
+                backgroundColor = PastelPeach,
+                modifier = Modifier.size(44.dp)
+            ) {
+                CozyBackIcon(modifier = Modifier.size(20.dp), color = TextDark)
+            }
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            Text(
+                text = "Glow Draw 🌌",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextDark
+                ),
+                modifier = Modifier.weight(1f)
+            )
         }
 
-        // Undo
-        IconButton(
-            onClick = onUndo,
-            enabled = canUndo,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .size(40.dp)
-                .background(if (canUndo) PastelYellow else Color.LightGray.copy(alpha = 0.3f), shape = CircleShape)
-        ) {
-            Text("↩️", fontSize = 16.sp)
-        }
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Redo
-        IconButton(
-            onClick = onRedo,
-            enabled = canRedo,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .size(40.dp)
-                .background(if (canRedo) PastelYellow else Color.LightGray.copy(alpha = 0.3f), shape = CircleShape)
+        // Row 2: Actions (Trash on the left, Undo + Redo + Save on the right)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("↪️", fontSize = 16.sp)
-        }
+            // Clear Trash
+            PlayfulIconButton(
+                onClick = onClearAll,
+                backgroundColor = PastelPink.copy(alpha = 0.5f),
+                modifier = Modifier.size(40.dp)
+            ) {
+                CozyTrashIcon(modifier = Modifier.size(18.dp), color = TextDark)
+            }
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Undo
+                PlayfulButton(
+                    onClick = onUndo,
+                    enabled = canUndo,
+                    backgroundColor = PastelYellow,
+                    contentColor = TextDark,
+                    modifier = Modifier.height(40.dp)
+                ) {
+                    Text("Undo", fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 4.dp))
+                }
 
-        // Save
-        PlayfulButton(
-            onClick = onSave,
-            backgroundColor = PastelMint,
-            contentColor = TextDark,
-            modifier = Modifier.height(40.dp)
-        ) {
-            Text("Save 💾", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // Redo
+                PlayfulButton(
+                    onClick = onRedo,
+                    enabled = canRedo,
+                    backgroundColor = PastelYellow,
+                    contentColor = TextDark,
+                    modifier = Modifier.height(40.dp)
+                ) {
+                    Text("Redo", fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 4.dp))
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Save
+                PlayfulButton(
+                    onClick = onSave,
+                    backgroundColor = PastelMint,
+                    contentColor = TextDark,
+                    modifier = Modifier.height(40.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    ) {
+                        CozySaveIcon(modifier = Modifier.size(16.dp), color = TextDark)
+                        Text("Save", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
 }
@@ -514,47 +574,63 @@ private fun GlowToolbar(
     brushSize: Float,
     onColorSelected: (Color) -> Unit,
     onBrushSizeChanged: (Float) -> Unit,
+    onSpectrumClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Ultra vibrant child-friendly neon colors
-    val neonColors = listOf(
-        Color(0xFF00F5FF), // Neon Cyan
-        Color(0xFF39FF14), // Neon Green
-        Color(0xFFFF007F), // Neon Pink
-        Color(0xFFFFF000), // Neon Yellow
-        Color(0xFFFF5F1F), // Neon Orange
-        Color(0xFFBD00FF), // Neon Purple
-        Color(0xFF00FFFF), // Cyan
-        Color(0xFFFF00FF), // Magenta
-        Color(0xFFFFFF00), // Yellow
-        Color(0xFFFFFFFF)  // Bright White
-    )
+    val colors = remember { AppColorSpectrum }
 
     Card(
         shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
             .shadow(12.dp, shape = MaterialTheme.shapes.extraLarge)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
-            // Slider Row
+            // Glow Size and Spectrum row
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Glow Size: ", style = MaterialTheme.typography.bodyLarge, color = TextDark)
-                Slider(
-                    value = brushSize,
-                    onValueChange = onBrushSizeChanged,
-                    valueRange = 6f..60f,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    Text("Glow Size: ", style = MaterialTheme.typography.bodyLarge.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold), color = TextDark)
+                    Slider(
+                        value = brushSize,
+                        onValueChange = onBrushSizeChanged,
+                        valueRange = 6f..60f,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Spectrum selector button
+                PlayfulButton(
+                    onClick = onSpectrumClick,
+                    backgroundColor = PastelPurple,
+                    contentColor = TextDark,
+                    shape = CircleShape,
+                    border = null,
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    ) {
+                        CozySpectrumIcon(modifier = Modifier.size(16.dp))
+                        Text("Spectrum", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -565,7 +641,7 @@ private fun GlowToolbar(
                 contentPadding = PaddingValues(horizontal = 4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(neonColors) { color ->
+                items(colors) { color ->
                     val isSelected = color == selectedColor
                     Box(
                         modifier = Modifier

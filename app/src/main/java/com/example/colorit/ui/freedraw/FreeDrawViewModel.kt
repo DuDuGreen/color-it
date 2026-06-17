@@ -20,7 +20,7 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 
 enum class FreeDrawTool {
-    PENCIL, MARKER, BRUSH, ERASER
+    PENCIL, MARKER, BRUSH, ERASER, STRAIGHT_LINE
 }
 
 @HiltViewModel
@@ -69,6 +69,10 @@ class FreeDrawViewModel @Inject constructor(
             }
             FreeDrawTool.ERASER -> {
                 _brushSize.value = 32f
+                _opacity.value = 1.0f
+            }
+            FreeDrawTool.STRAIGHT_LINE -> {
+                _brushSize.value = 6f
                 _opacity.value = 1.0f
             }
         }
@@ -148,10 +152,16 @@ class FreeDrawViewModel @Inject constructor(
                 val path = android.graphics.Path()
                 val first = stroke.points.first()
                 path.moveTo(first.x, first.y)
-                
-                for (i in 1 until stroke.points.size) {
-                    val p = stroke.points[i]
-                    path.lineTo(p.x, p.y)
+
+                if (stroke.isStraightLine && stroke.points.size >= 2) {
+                    // Straight line: just draw from first to last
+                    val last = stroke.points.last()
+                    path.lineTo(last.x, last.y)
+                } else {
+                    for (i in 1 until stroke.points.size) {
+                        val p = stroke.points[i]
+                        path.lineTo(p.x, p.y)
+                    }
                 }
                 canvas.drawPath(path, paint)
             }
