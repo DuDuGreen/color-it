@@ -7,10 +7,10 @@ plugins {
 }
 
 android {
-    namespace = "com.example.colorit"
+    namespace = "com.starkified.colorit"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.example.colorit"
+        applicationId = "com.starkified.colorit"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -37,7 +37,9 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{AL2.0,L" +
+                    "" +
+                    "GPL2.1}"
         }
     }
 }
